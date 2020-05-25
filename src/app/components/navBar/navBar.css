@@ -1,0 +1,7 @@
+.navbar-nav li{
+    text-transform: uppercase !important;
+    width: max-content !important;
+}
+.navbar-nav .nav-item .active {
+    background: $orange !important; 
+}

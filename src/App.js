@@ -1,24 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import { Router } from 'react-router-dom';
+import Routes from './app/shared/Routes';
+import Navbar from './app/components/navBar/navBar';
 import './App.css';
+import History from './history';
+import fire from './firebase';
 
 function App() {
+  const [userProps, setUser] = useState({
+    userName: 'Demo User',
+    isUserLoggedIn: false
+  });
+
+  useEffect(() => {
+    (() => {
+      if (userProps.isUserLoggedIn) {
+        History.push('/starwars');
+      }
+    })();
+    return () => {
+      fire.auth().signOut();
+    }
+  }, [userProps]);
+
+  useEffect(() => {
+    fire.auth().onAuthStateChanged((user) =>{
+      if(user){
+        setUser({ ...userProps, isUserLoggedIn:true });
+      }
+    })
+}, []);
+
+console.log('isUserLooged in in app.js', userProps.isUserLoggedIn)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Router history={History}>
+        <div className='App'>
+          {
+            (<>
+              <Navbar isUserLoggedIn={userProps.isUserLoggedIn}/>
+              <Routes isAuthorised={userProps.isUserLoggedIn} />
+            </>)
+          }
+        </div>
+      </Router>
     </div>
   );
 }
